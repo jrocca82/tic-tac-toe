@@ -1,9 +1,22 @@
 body {
     box-sizing: border-box;
+    justify-content: center;
+    width: "100vw";
+    background-color:cadetblue;
+  }
+
+  h1 {
+    width: "100vw";
+    font-family:'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+  }
+
+  .js-container {
+    width: "100vw"
   }
   
   .board {
-    width: 150px;
+    display: "flex";
+    width: 450px;
     border: 2px solid black;
   }
   
@@ -12,10 +25,10 @@ body {
   }
   
   .cell {
-    width: 50px;
-    height: 50px;
+    width: 150px;
+    height: 150px;
     border: 1px solid black;
     text-align: center;
-    line-height: 50px;
+    line-height: 150px;
   }
   

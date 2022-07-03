@@ -1,7 +1,5 @@
-function renderBoard(board) {
-  let innerHtml = `<pre>${getBoardString(board)}</pre>`;
-  document.querySelector(".js-container").innerHTML = innerHtml;
-}
+const $cells = document.querySelectorAll(".js-cell");
+const cellsArray = Array.from($cells);
 
 function getBoardString(gameBoard) {
   let boardString = "";
@@ -15,34 +13,26 @@ function getBoardString(gameBoard) {
   return boardString;
 }
 
-function getUserInput(nextPlayerSymbol, gameBoard) {
-  return +prompt(
-    `Board:\n${getBoardString(
-      gameBoard
-    )} Enter ${nextPlayerSymbol}'s next move (1-9):`
-  );
-}
-
 function isMoveValid(move, gameBoard) {
-  const boardIndex = move - 1;
-
   return (
     typeof move === "number" &&
-    move >= 1 &&
-    move <= 9 &&
-    gameBoard[boardIndex] === null
+    move >= 0 &&
+    move <= 8 &&
+    gameBoard[move] === null
   );
 }
 
-function makeAMove(gameBoard, nextPlayerSymbol) {
+function makeAMove(gameBoard, nextPlayerSymbol, element) {
   const newGameBoard = [...gameBoard];
-  let move = null;
-  do {
-    move = getUserInput(nextPlayerSymbol, gameBoard);
-  } while (!isMoveValid(move, gameBoard));
-  const boardIndex = move - 1;
-  newGameBoard[boardIndex] = nextPlayerSymbol;
-  renderBoard(newGameBoard);
+  const moveIndex = cellsArray.indexOf(element);
+  if (!isMoveValid(moveIndex, gameBoard)) {
+    return gameBoard;
+  }
+  newGameBoard[moveIndex] = nextPlayerSymbol;
+  element.innerText = nextPlayerSymbol;
+  nextPlayerSymbol = nextPlayerSymbol === "X" ? "O" : "X";
+  const nextPlayer = document.querySelector("#next-player");
+  nextPlayer.innerText = `Next player: ${nextPlayerSymbol}`;
   return newGameBoard;
 }
 
@@ -55,7 +45,7 @@ function hasLastMoverWon(lastMove, gameBoard) {
     [1, 4, 7],
     [2, 5, 8],
     [0, 4, 8],
-    [2, 4, 6]
+    [2, 4, 6],
   ];
   for (let [i1, i2, i3] of winnerCombos) {
     if (
@@ -71,7 +61,8 @@ function hasLastMoverWon(lastMove, gameBoard) {
 
 function isGameOver(gameBoard, currentPlayerSymbol) {
   if (hasLastMoverWon(currentPlayerSymbol, gameBoard)) {
-    alert(`Congratulations, ${currentPlayerSymbol} has won the game`);
+    const winnerDiv = document.querySelector("#js-winner");
+    winnerDiv.innerText = `Congratulations, ${currentPlayerSymbol} has won the game`;
     return true;
   }
   if (gameBoard.every((element) => element !== null)) {
@@ -82,17 +73,16 @@ function isGameOver(gameBoard, currentPlayerSymbol) {
   return false;
 }
 
-function ticTacToe() {
-  // State space
-  let gameBoard = new Array(9).fill(null);
-  let currentPlayerSymbol = null;
+let gameBoard = new Array(9).fill(null);
+let gameOver = false;
+let currentPlayerSymbol;
 
-  // Computations
-  renderBoard(gameBoard);
-  do {
-    currentPlayerSymbol = currentPlayerSymbol === "X" ? "O" : "X";
-    gameBoard = makeAMove(gameBoard, currentPlayerSymbol);
-  } while (!isGameOver(gameBoard, currentPlayerSymbol));
+function clickHandler(event) {
+  event.preventDefault();
+  if (gameOver === true) return;
+  currentPlayerSymbol = currentPlayerSymbol === "X" ? "O" : "X";
+  gameBoard = makeAMove(gameBoard, currentPlayerSymbol, event.srcElement);
+  gameOver = isGameOver(gameBoard, currentPlayerSymbol);
 }
 
-ticTacToe();
+$cells.forEach(($cell) => $cell.addEventListener("click", clickHandler));
